@@ -1,4 +1,7 @@
-from Board import Board
+from App import *
+from Color import *
 
-print('Starting Chessica')
-Board('white').init_gl()
+
+if __name__ == "__main__":
+    theApp = App()
+    theApp.on_execute()
