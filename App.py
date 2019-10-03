@@ -1,16 +1,19 @@
 import pygame
 from pygame.locals import *
+from Tile import Tile
 
 
 class App:
     def __init__(self):
+        self.white = (255, 255, 255)
+        self.black = (0, 0, 0)
         self.running = True
-        self.display_surf = None
+        self.screen = None
         self.size = self.weight, self.height = 1000, 1000
 
     def on_init(self):
         pygame.init()
-        self.display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        self.screen = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.running = True
 
     def on_event(self, event):
@@ -22,7 +25,9 @@ class App:
         pass
 
     def on_render(self):
-        pass
+        pygame.draw.rect(self.screen, self.white, (0, 936, 64, 64))
+        pygame.display.update()
+
 
     def on_cleanup(self):
         pygame.quit()
