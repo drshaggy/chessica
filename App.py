@@ -55,6 +55,7 @@ class App:
         click = pygame.mouse.get_pressed()
         if click[0] == 1:  # If left mouse button is pressed
             selected_tile = self.find_tile(mouse[0], mouse[1])
+            print(selected_tile)
             selected = pygame.image.load('resources/selected.png').convert()
             alpha = 64
             selected.set_alpha(alpha)
@@ -120,9 +121,10 @@ class App:
     def find_tile(self, x, y):
         tile_x = floor(x/64)
         tile_y = floor(y/64)
-        files = self.board.files[::-1]
+        files = self.board.files
+        ranks = self.board.ranks_rev
         st = files[tile_x]
-        r = str(self.board.ranks[tile_y])
+        r = str(ranks[tile_y])
         return st + r
 
 

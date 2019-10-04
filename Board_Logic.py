@@ -12,12 +12,12 @@ class Board:
         # Creates tile dictionary for locations
         self.tiles = {}
         self.ranks = [1, 2, 3, 4, 5, 6, 7, 8]
-        self.ranks.reverse()
+        self.ranks_rev = self.ranks[::-1]
         self.files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-        self.files.reverse()
+        self.files_rev = self.files[::-1]
         for x in range(8):
             for y in range(8):
-                self.tiles[self.files[x]+str(self.ranks[y])] = (x*64, y*64)
+                self.tiles[self.files[x]+str(self.ranks_rev[y])] = (x*64, y*64)
 
     def generate_pieces(self, color):
         if color == 'white':
