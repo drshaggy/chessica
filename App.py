@@ -45,8 +45,6 @@ class App:
         self.board.generate_pieces('white')
         self.board.generate_pieces('black')
 
-        # Initialize Players
-
     def on_event(self, event):
         if event.type == pygame.QUIT:
             print("Exiting App")
@@ -56,7 +54,15 @@ class App:
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         if click[0] == 1:  # If left mouse button is pressed
-            print(self.find_tile(mouse[0], mouse[1]))
+            selected_tile = self.find_tile(mouse[0], mouse[1])
+            selected = pygame.image.load('resources/selected.png').convert()
+            alpha = 64
+            selected.set_alpha(alpha)
+            tiles = self.board.tiles
+            loc = tiles[selected_tile]
+            self.screen.blit(selected, loc)
+            pygame.display.update()
+
 
     def on_render(self):
         self.screen.fill(self.gray)
@@ -118,3 +124,5 @@ class App:
         st = files[tile_x]
         r = str(self.board.ranks[tile_y])
         return st + r
+
+
