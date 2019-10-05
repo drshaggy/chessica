@@ -32,6 +32,8 @@ class App:
                             12: 'black_king'}
         self.board = Board(True)
         self.player1 = Player(True)
+        self.selected_tile = None
+        self.previous_tile = None
 
     def on_init(self):
         # Initialize gui
@@ -49,26 +51,27 @@ class App:
         if event.type == pygame.QUIT:
             print("Exiting App")
             self.running = False
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                # todo move click functionality from on_loop to here
+                mouse = pygame.mouse.get_pos()
+                self.previous_tile = self.selected_tile
+                self.selected_tile = self.find_tile(mouse[0], mouse[1])
+                print(self.selected_tile)
+
+
+
+
 
     def on_loop(self):
-        mouse = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()
-        if click[0] == 1:  # If left mouse button is pressed
-            selected_tile = self.find_tile(mouse[0], mouse[1])
-            print(selected_tile)
-            selected = pygame.image.load('resources/selected.png').convert()
-            alpha = 64
-            selected.set_alpha(alpha)
-            tiles = self.board.tiles
-            loc = tiles[selected_tile]
-            self.screen.blit(selected, loc)
-            pygame.display.update()
+        pass
 
 
     def on_render(self):
         self.screen.fill(self.gray)
         self.generate_board()
         self.draw_pieces()
+        self.draw_selected()
         pygame.display.update()
 
     def on_cleanup(self):
@@ -127,4 +130,16 @@ class App:
         r = str(ranks[tile_y])
         return st + r
 
+    def draw_selected(self):
+        if self.selected_tile == None:
+            pass
+        elif self.selected_tile == self.previous_tile:
+            self.selected_tile = None
+        else:
+            selected = pygame.image.load('resources/selected.png').convert()
+            alpha = 64
+            selected.set_alpha(alpha)
+            tiles = self.board.tiles
+            loc = tiles[self.selected_tile]
+            self.screen.blit(selected, loc)
 
