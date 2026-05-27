@@ -58,7 +58,7 @@ export default function App() {
   const movesWidth = isMobile ? boardWidth + EVAL_WIDTH : MOVES_WIDTH
   const movesHeight = isMobile ? 180 : boardWidth
   const chatWidth = isMobile ? boardWidth + EVAL_WIDTH : DESKTOP_BOARD + COL_GAP + MOVES_WIDTH
-  const chatMarginLeft = isMobile ? 0 : EVAL_WIDTH
+  const chatMarginLeft = (isMobile || !showHints) ? 0 : EVAL_WIDTH
 
   const isActive = state.status === 'active'
   const isOver = ['white_won', 'black_won', 'draw'].includes(state.status)
@@ -121,7 +121,7 @@ export default function App() {
             <div className={isMobile ? 'flex flex-col gap-4' : 'flex gap-6 items-start'}>
               {/* Eval bar + board */}
               <div className="flex gap-2 items-start">
-                <EvalBar cp={currentEval} orientation={orientation} />
+                {showHints && <EvalBar cp={currentEval} orientation={orientation} />}
                 <div className="relative">
                   <Chessboard
                     position={state.game.fen()}
