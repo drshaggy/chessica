@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { api } from '../api'
+import { parseHighlights } from '../utils/parseHighlights'
+import type { Highlights } from '../utils/parseHighlights'
 
 interface Message {
   role: 'user' | 'ai'
@@ -9,9 +11,11 @@ interface Message {
 interface Props {
   gameId: string
   disabled?: boolean
+  fen: string
+  onHover: (h: Highlights | null) => void
 }
 
-export default function ChatPanel({ gameId, disabled }: Props) {
+export default function ChatPanel({ gameId, disabled, fen, onHover }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'ai', content: "Ask me anything about the position — plans, tactics, opening theory, or what I'm thinking." }
   ])
@@ -52,7 +56,10 @@ export default function ChatPanel({ gameId, disabled }: Props) {
     <div className="flex-1 min-h-0 flex flex-col p-3 gap-3">
       <div className="flex-1 min-h-0 overflow-y-auto space-y-3 pr-1">
         {messages.map((m, i) => (
-          <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            onMouseEnter={m.role === 'ai' ? () => onHover(parseHighlights(m.content, fen)) : undefined}
+            onMouseLeave={m.role === 'ai' ? () => onHover(null) : undefined}
+          >
             {m.role === 'ai' && (
               <div className="w-6 h-6 rounded-full bg-amber-500 flex items-center justify-center text-xs text-gray-900 font-bold shrink-0 mt-0.5">
                 AI
@@ -61,7 +68,7 @@ export default function ChatPanel({ gameId, disabled }: Props) {
             <div className={`max-w-[85%] rounded-lg px-3 py-2 text-sm leading-relaxed ${
               m.role === 'user'
                 ? 'bg-gray-700 text-gray-100'
-                : 'bg-gray-800 text-gray-200 border border-gray-700'
+                : 'bg-gray-800 text-gray-200 border border-gray-700 cursor-default'
             }`}>
               {m.content}
             </div>

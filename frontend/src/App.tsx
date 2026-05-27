@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import { useGame } from './hooks/useGame'
@@ -8,6 +8,7 @@ import EvalBar from './components/EvalBar'
 import Review from './components/Review'
 import ChatPanel from './components/ChatPanel'
 import type { GameSettings } from './types'
+import type { Highlights } from './utils/parseHighlights'
 
 type Tab = 'game' | 'review'
 
@@ -22,6 +23,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('game')
 
   const [winW, setWinW] = useState(() => window.innerWidth)
+  const [highlights, setHighlights] = useState<Highlights>({ arrows: [], squares: [] })
+  const onHover = useCallback((h: Highlights | null) => setHighlights(h ?? { arrows: [], squares: [] }), [])
   useEffect(() => {
     const onResize = () => setWinW(window.innerWidth)
     window.addEventListener('resize', onResize)
@@ -108,6 +111,10 @@ export default function App() {
                     customBoardStyle={{ borderRadius: '6px', boxShadow: '0 4px 24px rgba(0,0,0,0.5)' }}
                     customLightSquareStyle={{ backgroundColor: '#f0d9b5' }}
                     customDarkSquareStyle={{ backgroundColor: '#b58863' }}
+                    customArrows={highlights.arrows.map(([f, t]) => [f, t, 'rgba(96,165,250,0.85)'] as [string, string, string])}
+                    customSquareStyles={Object.fromEntries(
+                      highlights.squares.map(sq => [sq, { backgroundColor: 'rgba(96,165,250,0.25)' }])
+                    )}
                   />
                   {state.waiting && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded">
@@ -211,7 +218,7 @@ export default function App() {
                   <div className="px-3 py-2 border-b border-gray-800 shrink-0">
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Chat with AI</span>
                   </div>
-                  <ChatPanel gameId={state.gameId} />
+                  <ChatPanel gameId={state.gameId} fen={state.game.fen()} onHover={onHover} />
                 </div>
               </div>
             )}
