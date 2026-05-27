@@ -36,8 +36,12 @@ export default function Review({ gameId, pgn }: Props) {
       if (r.status === 'done' && r.analysis) {
         setAnalysis(r.analysis)
         setStatus('done')
+      } else if (r.status === 'pending') {
+        setStatus('pending')
       } else {
-        setStatus(r.status as 'idle' | 'pending' | 'done' | 'error')
+        // Auto-start analysis — no extra click needed
+        setStatus('pending')
+        api.requestAnalysis(gameId)
       }
     })
   }, [gameId])
@@ -82,19 +86,13 @@ export default function Review({ gameId, pgn }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-100">Game Review</h2>
-        {status === 'idle' && (
-          <button
-            onClick={requestAnalysis}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-gray-900 font-semibold rounded text-sm"
-          >
-            Analyse Game
-          </button>
-        )}
         {status === 'pending' && (
           <span className="text-sm text-amber-400 animate-pulse">Analysing…</span>
         )}
         {status === 'error' && (
-          <span className="text-sm text-red-400">Analysis failed</span>
+          <button onClick={requestAnalysis} className="text-sm text-red-400 hover:text-red-300">
+            Analysis failed — retry
+          </button>
         )}
       </div>
 

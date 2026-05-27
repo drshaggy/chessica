@@ -231,19 +231,21 @@ export default function App() {
             {/* Chat row */}
             {state.gameId && (
               <div style={{ marginLeft: chatMarginLeft, width: chatWidth }}>
-                {/* Drag handle */}
-                <div
-                  onMouseDown={onDragHandleMouseDown}
-                  className="flex items-center justify-center h-3 cursor-ns-resize group mb-1 select-none"
-                >
-                  <div className="w-10 h-1 rounded-full bg-gray-700 group-hover:bg-amber-500 transition-colors" />
-                </div>
                 <div
                   className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col overflow-hidden"
                   style={{ height: chatHeight }}
                 >
-                  <div className="px-3 py-2 border-b border-gray-800 shrink-0">
+                  {/* Header doubles as resize handle */}
+                  <div
+                    onMouseDown={onDragHandleMouseDown}
+                    className="px-3 py-2 border-b border-gray-800 shrink-0 flex items-center justify-between cursor-ns-resize select-none hover:bg-gray-800 transition-colors"
+                  >
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Chat with AI</span>
+                    <svg className="text-gray-600 hover:text-amber-400" width="16" height="10" viewBox="0 0 16 10" fill="currentColor">
+                      <rect y="0" width="16" height="2" rx="1"/>
+                      <rect y="4" width="16" height="2" rx="1"/>
+                      <rect y="8" width="16" height="2" rx="1"/>
+                    </svg>
                   </div>
                   <ChatPanel gameId={state.gameId} fen={state.game.fen()} onHover={onHover} />
                 </div>
