@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { Chess } from 'chess.js'
 import { useGame } from './hooks/useGame'
@@ -25,11 +25,31 @@ export default function App() {
   const [winW, setWinW] = useState(() => window.innerWidth)
   const [highlights, setHighlights] = useState<Highlights>({ arrows: [], squares: [] })
   const onHover = useCallback((h: Highlights | null) => setHighlights(h ?? { arrows: [], squares: [] }), [])
+  const [chatHeight, setChatHeight] = useState(CHAT_HEIGHT)
+  const dragState = useRef<{ startY: number; startH: number } | null>(null)
+
   useEffect(() => {
     const onResize = () => setWinW(window.innerWidth)
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
+
+  const onDragHandleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    dragState.current = { startY: e.clientY, startH: chatHeight }
+    const onMove = (e: MouseEvent) => {
+      if (!dragState.current) return
+      const delta = dragState.current.startY - e.clientY // drag up = grow
+      setChatHeight(Math.max(140, Math.min(600, dragState.current.startH + delta)))
+    }
+    const onUp = () => {
+      dragState.current = null
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [chatHeight])
 
   // On mobile: board fills screen minus p-4 padding (32px) minus eval bar
   const isMobile = winW < 768
@@ -211,9 +231,16 @@ export default function App() {
             {/* Chat row */}
             {state.gameId && (
               <div style={{ marginLeft: chatMarginLeft, width: chatWidth }}>
+                {/* Drag handle */}
+                <div
+                  onMouseDown={onDragHandleMouseDown}
+                  className="flex items-center justify-center h-3 cursor-ns-resize group mb-1 select-none"
+                >
+                  <div className="w-10 h-1 rounded-full bg-gray-700 group-hover:bg-amber-500 transition-colors" />
+                </div>
                 <div
                   className="bg-gray-900 border border-gray-800 rounded-lg flex flex-col overflow-hidden"
-                  style={{ height: CHAT_HEIGHT }}
+                  style={{ height: chatHeight }}
                 >
                   <div className="px-3 py-2 border-b border-gray-800 shrink-0">
                     <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">Chat with AI</span>
