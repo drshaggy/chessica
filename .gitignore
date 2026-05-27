@@ -1,0 +1,22 @@
+# Environment / secrets
+.env
+
+# Generated database
+data/chess.db
+
+# Syzygy tablebases (downloaded separately, can be large)
+data/syzygy/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Vite
+frontend/dist/

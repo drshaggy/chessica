@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8097:8097"
+    volumes:
+      - ./data:/data
+      - ./backend/src:/app/src
+      - /home/connor/.local/share/claude/versions/2.1.150:/usr/local/bin/claude:ro
+      - /home/connor/.claude:/root/.claude:ro
+    environment:
+      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN}
+      - CLAUDE_MODEL=claude-sonnet-4-6
+      - DATA_DIR=/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "8098:5173"
+    volumes:
+      - ./frontend/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:8095
+    depends_on:
+      - backend
+    restart: unless-stopped
