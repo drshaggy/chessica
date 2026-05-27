@@ -7,6 +7,17 @@ interface Props {
   disabled?: boolean
 }
 
+const LEVEL_ELO: Record<string, string> = {
+  beginner:    '~1200',
+  novice:      '~1500',
+  intermediate:'~1700',
+  club:        '~1900',
+  expert:      '~2100',
+  master:      '~2400',
+  grandmaster: '~2800',
+  max:         'max',
+}
+
 const PRESETS = [
   { label: 'Sicilian Dragon', value: 'Play the Sicilian Dragon as Black. After 1.e4 c5, aim for the Dragon setup with ...g6, ...d6, ...Bg7. Launch a kingside attack.' },
   { label: "King's Indian", value: "Play the King's Indian Defence as Black. Castle kingside early and launch a kingside counterattack." },
@@ -19,7 +30,7 @@ const PRESETS = [
 export default function GameSetup({ onStart, disabled }: Props) {
   const [levels, setLevels] = useState<string[]>([])
   const [color, setColor] = useState<'white' | 'black' | 'random'>('white')
-  const [level, setLevel] = useState('master')
+  const [level, setLevel] = useState('intermediate')
   const [style, setStyle] = useState('')
 
   useEffect(() => {
@@ -62,7 +73,7 @@ export default function GameSetup({ onStart, disabled }: Props) {
         >
           {(levels.length ? levels : ['beginner','novice','intermediate','club','expert','master','grandmaster','max']).map(l => (
             <option key={l} value={l}>
-              {l.charAt(0).toUpperCase() + l.slice(1)}
+              {l.charAt(0).toUpperCase() + l.slice(1)}{LEVEL_ELO[l] ? ` (${LEVEL_ELO[l]})` : ''}
             </option>
           ))}
         </select>
