@@ -23,6 +23,7 @@ export default function App() {
   const [tab, setTab] = useState<Tab>('game')
 
   const [winW, setWinW] = useState(() => window.innerWidth)
+  const [showHints, setShowHints] = useState(true)
   const [highlights, setHighlights] = useState<Highlights>({ arrows: [], squares: [] })
   const onHover = useCallback((h: Highlights | null) => setHighlights(h ?? { arrows: [], squares: [] }), [])
   const [chatHeight, setChatHeight] = useState(CHAT_HEIGHT)
@@ -172,51 +173,66 @@ export default function App() {
                     <div className="bg-gray-900 rounded-lg p-3 border border-gray-800 shrink-0 mb-2">
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
                         <span>Level: <span className="text-gray-300">{state.gameData?.settings.stockfish_level}</span></span>
-                        <span>You: <span className="text-gray-300">{playerColor}</span></span>
+                        <div className="flex items-center gap-2">
+                          <span>You: <span className="text-gray-300">{playerColor}</span></span>
+                          <button
+                            onClick={() => setShowHints(h => !h)}
+                            title={showHints ? 'Hide hints' : 'Show hints'}
+                            className="text-gray-600 hover:text-gray-300 transition-colors"
+                          >
+                            {showHints ? (
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            ) : (
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            )}
+                          </button>
+                        </div>
                       </div>
-                      {state.gameData?.agent_state?.book_line && (
-                        <div className="text-xs text-blue-400 truncate">
-                          {state.gameData.agent_state.book_line as string}
-                        </div>
-                      )}
-                      {state.gameData?.agent_state?.plan && (
-                        <div className="text-xs text-gray-500 italic mt-0.5 truncate"
-                          title={state.gameData.agent_state.plan as string}>
-                          {state.gameData.agent_state.plan as string}
-                        </div>
-                      )}
+                      {showHints && (<>
+                        {state.gameData?.agent_state?.book_line && (
+                          <div className="text-xs text-blue-400 truncate">
+                            {state.gameData.agent_state.book_line as string}
+                          </div>
+                        )}
+                        {state.gameData?.agent_state?.plan && (
+                          <div className="text-xs text-gray-500 italic mt-0.5 truncate"
+                            title={state.gameData.agent_state.plan as string}>
+                            {state.gameData.agent_state.plan as string}
+                          </div>
+                        )}
+                        {state.gameData?.book_moves && state.gameData.book_moves.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-1">
+                            {state.gameData.book_moves.map(m => (
+                              <button key={m.uci}
+                                onClick={() => isActive && !state.waiting && makeMove(m.uci)}
+                                className="text-xs px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded hover:bg-blue-500/20 font-mono">
+                                {m.san}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {state.gameData?.tablebase && (
+                          <div className="mt-2 flex items-center flex-wrap gap-1">
+                            <span className={`text-xs font-semibold ${
+                              state.gameData.tablebase.wdl === 'win' ? 'text-green-400' :
+                              state.gameData.tablebase.wdl === 'loss' ? 'text-red-400' : 'text-gray-400'}`}>
+                              TB: {state.gameData.tablebase.wdl.toUpperCase()}
+                              {state.gameData.tablebase.dtz != null && ` DTZ${state.gameData.tablebase.dtz}`}
+                            </span>
+                            {state.gameData.tablebase.moves.slice(0, 3).map(m => (
+                              <button key={m.uci}
+                                onClick={() => isActive && !state.waiting && makeMove(m.uci)}
+                                className={`text-xs px-1.5 py-0.5 border rounded font-mono ${
+                                  m.wdl === 'win' ? 'bg-green-500/10 border-green-500/30 text-green-300' :
+                                  m.wdl === 'loss' ? 'bg-red-500/10 border-red-500/30 text-red-300' :
+                                  'bg-gray-800 border-gray-700 text-gray-400'}`}>
+                                {m.san}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>)}
                       {state.error && <div className="text-xs text-red-400 mt-1">{state.error}</div>}
-                      {state.gameData?.book_moves && state.gameData.book_moves.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {state.gameData.book_moves.map(m => (
-                            <button key={m.uci}
-                              onClick={() => isActive && !state.waiting && makeMove(m.uci)}
-                              className="text-xs px-1.5 py-0.5 bg-blue-500/10 border border-blue-500/30 text-blue-300 rounded hover:bg-blue-500/20 font-mono">
-                              {m.san}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {state.gameData?.tablebase && (
-                        <div className="mt-2 flex items-center flex-wrap gap-1">
-                          <span className={`text-xs font-semibold ${
-                            state.gameData.tablebase.wdl === 'win' ? 'text-green-400' :
-                            state.gameData.tablebase.wdl === 'loss' ? 'text-red-400' : 'text-gray-400'}`}>
-                            TB: {state.gameData.tablebase.wdl.toUpperCase()}
-                            {state.gameData.tablebase.dtz != null && ` DTZ${state.gameData.tablebase.dtz}`}
-                          </span>
-                          {state.gameData.tablebase.moves.slice(0, 3).map(m => (
-                            <button key={m.uci}
-                              onClick={() => isActive && !state.waiting && makeMove(m.uci)}
-                              className={`text-xs px-1.5 py-0.5 border rounded font-mono ${
-                                m.wdl === 'win' ? 'bg-green-500/10 border-green-500/30 text-green-300' :
-                                m.wdl === 'loss' ? 'bg-red-500/10 border-red-500/30 text-red-300' :
-                                'bg-gray-800 border-gray-700 text-gray-400'}`}>
-                              {m.san}
-                            </button>
-                          ))}
-                        </div>
-                      )}
                     </div>
 
                     {/* Move list */}
